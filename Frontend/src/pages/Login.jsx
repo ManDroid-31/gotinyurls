@@ -1,14 +1,36 @@
 import { useState } from "react";
 import Navbar from "../components/Navbar";
-
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { Link } from "react-router-dom";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+  const [message, setMessage] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log({ email, password });
+
+    try {
+      const res = await axios.post(
+        import.meta.env.VITE_BACKEND_URL + "/api/auth/login",
+        { email, password },
+        { headers: { "Content-Type": "application/json" } }
+      );
+
+      console.log("Login successful:", res.data);
+      setMessage("Login successful ✅");
+
+      if (res.data.token) {
+        localStorage.setItem("token", res.data.token);
+      }
+
+      navigate("/dashboard"); 
+    } catch (err) {
+      setMessage(err.response?.data?.message || "Login failed ❌");
+    }
   };
 
   return (
@@ -36,7 +58,7 @@ export default function Login() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="john@example.com"
+                  placeholder="omkar@example.com"
                   className="w-full px-2 py-2 bg-transparent outline-none text-sm"
                   required
                 />
@@ -45,7 +67,9 @@ export default function Login() {
 
             {/* Password */}
             <div>
-              <label className="block text-sm text-gray-300 mb-1">Password</label>
+              <label className="block text-sm text-gray-300 mb-1">
+                Password
+              </label>
               <div className="flex items-center border border-gray-700 rounded-lg px-3">
                 <span className="text-gray-500">🔒</span>
                 <input
@@ -66,13 +90,27 @@ export default function Login() {
             >
               Sign In
             </button>
+
+            {message ? (
+              <p
+                className={`mt-2 text-sm h-5 ${
+                  message.toLowerCase().includes("invalid")
+                    ? "text-red-500"
+                    : "text-green-500"
+                }`}
+              >
+                {message}
+              </p>
+            ) : (
+              <p className={`mt-2 text-sm h-5`}></p>
+            )}
           </form>
 
           <p className="mt-6 text-center text-sm text-gray-400">
             Don’t have an account?{" "}
-            <a href="/signup" className="text-blue-400 hover:underline">
+            <Link to="/signup" className="text-blue-400 hover:underline">
               Sign up
-            </a>
+            </Link>
           </p>
         </div>
       </div>
