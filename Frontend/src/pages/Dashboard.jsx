@@ -6,7 +6,7 @@ import DashboardStats from "@/components/DashboardStats";
 import { Scissors, CheckCheck, Copy } from "lucide-react";
 import AnalyticsChart from "@/components/AnalyticsChart";
 import toast from "react-hot-toast";
-import UrlTable from "../components/UrlTable";
+// import UrlTable from "../components/UrlTable";
 
 const Dashboard = () => {
   const { email, token, name } = useSelector((state) => state.user);
@@ -171,7 +171,7 @@ const Dashboard = () => {
             <AnalyticsChart />
           </div>
         </div>
-        <UrlTable />
+        {/* <UrlTable /> */}
       </div>
     </div>
   );
