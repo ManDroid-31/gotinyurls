@@ -14,7 +14,7 @@ app.use(morgan("dev"));
 app.use(express.json());
 app.use(cookieParser());
 
-const allowedOrigins = ["http://localhost:5173"];
+const allowedOrigins = [process.env.FRONTEND_URL];
 
 app.use(
   cors({

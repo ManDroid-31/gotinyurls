@@ -7,8 +7,6 @@ export const shortenUrl = async (req, res) => {
   try {
     const { originalUrl, alias, email } = req.body;
 
-    console.log("Request body:", req.body);
-
     if (!originalUrl) {
       return res.status(400).json({ message: "Original URL is required" });
     }
@@ -45,11 +43,35 @@ for (let i = 6; i >= 0; i--) {
       dailyClicks,
     });
 
-    console.log("New URL created:", newUrl);
-
     res.status(201).json(newUrl);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error" });
   }
 };
+
+
+export const getUserUrls = async (req, res) => {
+
+  try {
+
+    const { email } = req.query; 
+
+    if (!email) {
+      return res.status(400).json({ message: "Email is required" });
+    }
+
+    const user = await User.findOne({ email: email });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const urls = await Url.find({ user: user._id });
+
+    res.status(200).json(urls);
+
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
+}

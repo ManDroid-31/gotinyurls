@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import axios from "axios";
 import DashboardNavbar from "@/components/DashboardNavbar";
@@ -10,6 +10,27 @@ import URLTable from "@/components/UrlTable";
 
 const Dashboard = () => {
   const { email, token, name } = useSelector((state) => state.user);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    const fetchUserUrls = async () => {
+      try {
+        const res = await axios.get(
+          import.meta.env.VITE_BACKEND_URL + "/api/url/user-urls",
+          {
+            params: { email: localStorage.getItem("email") }, // ✅
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+
+        console.log("User URLs:", res.data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchUserUrls();
+  }, []);
 
   const [longUrl, setLongUrl] = useState("");
   const [alias, setAlias] = useState("");
