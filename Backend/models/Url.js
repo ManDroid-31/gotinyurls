@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 const dailyClickSchema = new mongoose.Schema({
-  date: { type: Date, required: true },
+  date: { type: String, required: true },
   clicks: { type: Number, default: 0 },
 });
 

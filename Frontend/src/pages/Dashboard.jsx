@@ -4,6 +4,9 @@ import axios from "axios";
 import DashboardNavbar from "@/components/DashboardNavbar";
 import DashboardStats from "@/components/DashboardStats";
 import { Scissors, CheckCheck, Copy } from "lucide-react";
+import AnalyticsChart from "@/components/AnalyticsChart";
+import toast from "react-hot-toast";
+import URLTable from "@/components/UrlTable";
 
 const Dashboard = () => {
   const { email, token, name } = useSelector((state) => state.user);
@@ -34,9 +37,9 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen w-screen">
       <DashboardNavbar />
-      <div className="bg-[#0a0a0a] text-white p-6 space-y-6">
+      <div className="bg-[#0a0a0a] text-white p-6 space-y-6 h-">
         {/* Header */}
         <div className="flex justify-between items-center">
           <h1 className="text-3xl font-bold">
@@ -61,19 +64,29 @@ const Dashboard = () => {
 
             {/* Success / Error Message */}
             {shortened && (
-              <div className="flex gap-4 items-center border border-green-500 p-4 rounded-md bg-[#131320]">
-                <CheckCheck className="h-5 w-5 text-green-400" />
-                <div className="text-[#BBF7D0]">
-                  <p>URL shortened successfully!</p>
-                  <p className="text-[#93cca7]">
-                    {`https://shortify.co/${shortened.shortUrl}`}
-                  </p>
+              <div className="flex justify-between items-center border border-green-500 p-4 rounded-md bg-[#131320]">
+                <div className="flex items-start gap-2 ">
+                  <CheckCheck className="h-5 w-5 text-green-400" />
+                  <div className="text-[#BBF7D0]">
+                    <p>URL shortened successfully!</p>
+                    <p className="text-[#93cca7]">
+                      {`${import.meta.env.VITE_BACKEND_URL}/${
+                        shortened.shortUrl
+                      }`}
+                    </p>
+                  </div>
                 </div>
                 <button
                   onClick={() =>
-                    navigator.clipboard.writeText(
-                      `https://shortify.co/${shortened.shortUrl}`
-                    )
+                    navigator.clipboard
+                      .writeText(
+                        `${import.meta.env.VITE_BACKEND_URL}/${
+                          shortened.shortUrl
+                        }`
+                      )
+                      .then(() => {
+                        toast.success("Shortened URL copied to clipboard!");
+                      })
                   }
                   className="p-2 rounded-md border border-gray-600 bg-black text-white hover:text-[#BBF7D0]"
                 >
@@ -94,7 +107,7 @@ const Dashboard = () => {
                   🔗
                 </span>
                 <input
-                  type="text"
+                  type="url"
                   placeholder="https://example.com/very-long-url"
                   value={longUrl}
                   onChange={(e) => setLongUrl(e.target.value)}
@@ -132,10 +145,12 @@ const Dashboard = () => {
           </div>
 
           {/* 7-Day Analytics Chart */}
-          <div className="bg-gray-800 p-6 rounded-lg flex items-center md:col-span-2 justify-center min-h-[200px] md:min-h-[100%]">
-            <div className="text-gray-500">Chart goes here</div>
+
+          <div className="bg-[#0A0A0A] rounded-lg flex items-center md:col-span-2 justify-center md:min-h-[100%]">
+            <AnalyticsChart />
           </div>
         </div>
+        <URLTable />
       </div>
     </div>
   );
