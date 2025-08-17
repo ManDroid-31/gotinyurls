@@ -3,12 +3,15 @@ import Navbar from "../components/Navbar";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Link } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { login } from "@/store/userSlice";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
   const [message, setMessage] = useState("");
+  const dispatch = useDispatch();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -20,27 +23,31 @@ export default function Login() {
         { headers: { "Content-Type": "application/json" } }
       );
 
-      console.log("Login successful:", res.data);
       setMessage("Login successful ✅");
 
-      if (res.data.token) {
-        localStorage.setItem("token", res.data.token);
-      }
+      dispatch(
+        login({
+          email: res.data.email,
+          token: res.data.token,
+          name: res.data.name,
+        })
+      );
 
-      navigate("/dashboard"); 
+      navigate("/dashboard");
     } catch (err) {
+      console.error("Login error:", err);
       setMessage(err.response?.data?.message || "Login failed ❌");
     }
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-b from-[#0f172a] to-[#0a0f1e]">
+    <div className="min-h-screen flex flex-col bg-[#111111]">
       {/* Navbar */}
       <Navbar />
 
       {/* Login Card */}
       <div className="flex flex-1 justify-center items-center">
-        <div className="bg-[#070d1a] text-white rounded-2xl shadow-lg w-full max-w-md p-8">
+        <div className="bg-[#0A0A0A] text-white rounded-2xl shadow-lg w-full max-w-md p-8">
           <h2 className="text-2xl font-bold text-center mb-2 text-blue-400">
             Welcome Back
           </h2>

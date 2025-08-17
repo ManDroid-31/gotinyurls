@@ -1,5 +1,5 @@
 import express from "express";
-import { registerUser, loginUser } from "../controllers/auth.controller.js";
+import { registerUser, loginUser, verifyToken } from "../controllers/auth.controller.js";
 
 const router = express.Router();
 
@@ -8,5 +8,7 @@ router.post("/signup", registerUser);
 
 // POST /api/auth/login
 router.post("/login", loginUser);
+
+router.get("/verify", verifyToken);
 
 export default router;

@@ -5,6 +5,7 @@ import cors from "cors";
 import morgan from "morgan";
 import { connectDB } from "./config.js/db.js";
 import authRoutes from "./routes/auth.js";
+import urlRoutes from "./routes/url.js";
 
 const app = express();
 
@@ -31,6 +32,8 @@ app.use(
 app.get("/", (_req, res) => res.send("Shortify API OK"));
 
 app.use("/api/auth", authRoutes);
+
+app.use("/api/url", urlRoutes);
 
 const PORT = process.env.PORT || 5000;
 connectDB().then(() => {

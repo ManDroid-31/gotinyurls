@@ -3,9 +3,12 @@ import Navbar from "@/components/Navbar";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { login } from "@/store/userSlice";
 
 export default function Signup() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const [formData, setFormData] = useState({
     name: "",
@@ -32,7 +35,7 @@ export default function Signup() {
 
     try {
       const res = await axios.post(
-        import.meta.env.VITE_BACKEND_URL + "/api/auth/signup", 
+        import.meta.env.VITE_BACKEND_URL + "/api/auth/signup",
         {
           name: formData.name,
           email: formData.email,
@@ -43,13 +46,15 @@ export default function Signup() {
         }
       );
 
-      console.log("Signup successful:", res.data);
       setMessage("Signup successful ✅");
 
-      // Store token if returned
-      if (res.data.token) {
-        localStorage.setItem("token", res.data.token);
-      }
+      dispatch(
+        login({
+          email: res.data.email,
+          token: res.data.token,
+          name: res.data.name,
+        })
+      );
 
       navigate("/dashboard");
     } catch (err) {
@@ -58,13 +63,13 @@ export default function Signup() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-b from-[#0f172a] to-[#0a0f1e]">
+    <div className="min-h-screen flex flex-col bg-[#111111]">
       {/* Navbar */}
       <Navbar />
 
       {/* Signup Card */}
       <div className="flex flex-1 justify-center items-center">
-        <div className="bg-[#070d1a] text-white rounded-2xl shadow-lg w-full max-w-md p-8">
+        <div className="bg-[#0A0A0A] text-white rounded-2xl shadow-lg w-full max-w-md p-8">
           {/* Heading */}
           <h2 className="text-2xl font-bold text-center text-blue-400">
             Create Account
@@ -77,7 +82,9 @@ export default function Signup() {
           <form className="mt-8 space-y-4" onSubmit={handleSubmit}>
             {/* Full Name */}
             <div>
-              <label className="block text-sm text-gray-300 mb-1">Full Name</label>
+              <label className="block text-sm text-gray-300 mb-1">
+                Full Name
+              </label>
               <div className="flex items-center border border-gray-700 rounded-lg px-3">
                 <span className="text-gray-500">👤</span>
                 <input
@@ -111,7 +118,9 @@ export default function Signup() {
 
             {/* Password */}
             <div>
-              <label className="block text-sm text-gray-300 mb-1">Password</label>
+              <label className="block text-sm text-gray-300 mb-1">
+                Password
+              </label>
               <div className="flex items-center border border-gray-700 rounded-lg px-3">
                 <span className="text-gray-500">🔒</span>
                 <input
@@ -128,7 +137,9 @@ export default function Signup() {
 
             {/* Confirm Password */}
             <div>
-              <label className="block text-sm text-gray-300 mb-1">Confirm Password</label>
+              <label className="block text-sm text-gray-300 mb-1">
+                Confirm Password
+              </label>
               <div className="flex items-center border border-gray-700 rounded-lg px-3">
                 <span className="text-gray-500">🔒</span>
                 <input

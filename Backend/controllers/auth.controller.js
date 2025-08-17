@@ -1,6 +1,7 @@
 import User from "../models/User.js";
 import bcrypt from "bcryptjs";
 import generateToken from "../utils/generateToken.js";
+import jwt from "jsonwebtoken";
 
 // @desc   Register new user
 export const registerUser = async (req, res) => {
@@ -18,8 +19,6 @@ export const registerUser = async (req, res) => {
 
     // create user with hashed password
     const user = await User.create({ name, email, password: hashedPassword });
-
-    console.log("Register User", user);
 
     res.status(201).json({
       _id: user._id,
@@ -57,5 +56,17 @@ export const loginUser = async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
+  }
+};
+
+export const verifyToken = async (req, res) => {
+  const token = req.headers.authorization?.split(" ")[1]; // Expect: "Bearer TOKEN"
+  if (!token) return res.status(401).json({ message: "No token provided" });
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    return res.json({ valid: true });
+  } catch (err) {
+    return res.status(401).json({ valid: false, message: "Invalid token" });
   }
 };

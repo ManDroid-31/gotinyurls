@@ -1,12 +1,13 @@
 import { ArrowRight, Link2, MousePointer } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card"; 
+import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 export default function Hero() {
   return (
-    <section className="text-center text-white py-20 bg-gradient-to-b from-[#0f172a] to-[#0a0f1e] min-h-screen">
+    <section className="text-center text-white py-20 bg-[#0A0A0A] min-h-screen">
       {/* Title + Subtitle */}
       <h1 className="text-5xl font-extrabold leading-tight">
-        Shorten <span className="text-blue-400">URLs</span> <br /> Track Everything
+        Shorten <span className="text-blue-400">URLs</span> <br /> Track
+        Everything
       </h1>
       <p className="mt-6 text-gray-400 max-w-2xl mx-auto">
         Create powerful short links with advanced analytics, custom domains, and
@@ -19,7 +20,10 @@ export default function Hero() {
         <button className="px-6 py-3 bg-gradient-to-r from-blue-400 to-blue-600 text-white rounded-lg flex items-center gap-2">
           Get Started Free <ArrowRight size={18} />
         </button>
-        <Link to="/signup" className="px-6 py-3 bg-gray-800 rounded-lg border border-gray-700">
+        <Link
+          to="/signup"
+          className="px-6 py-3 bg-gray-800 rounded-lg border border-gray-700"
+        >
           Sign In
         </Link>
       </div>
@@ -45,7 +49,9 @@ export default function Hero() {
               {/* Short URL box */}
               <div className="flex items-center space-x-3 p-4 bg-gradient-to-r from-blue-500/10 to-blue-600/20 rounded-lg border border-blue-500/20">
                 <Link2 className="h-5 w-5 text-blue-400" />
-                <code className="text-blue-400 font-medium">shortify.co/abc123</code>
+                <code className="text-blue-400 font-medium">
+                  shortify.co/abc123
+                </code>
                 <div className="flex items-center space-x-2 ml-auto">
                   <MousePointer className="h-4 w-4 text-green-500" />
                   <span className="text-sm font-medium text-green-500">
