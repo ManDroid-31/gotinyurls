@@ -3,11 +3,12 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const email = localStorage.getItem("email");
 const token = localStorage.getItem("token");
+const name = localStorage.getItem("name");
 
 const initialState = {
   email: email ? email : null,
   token: token ? token : null,
-  name: null,
+  name: name ? name : null,
 };
 
 const userSlice = createSlice({
@@ -15,7 +16,6 @@ const userSlice = createSlice({
   initialState,
   reducers: {
     login: (state, action) => {
-
       state.email = action.payload.email;
       state.token = action.payload.token;
       state.name = action.payload.name;
