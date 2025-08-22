@@ -13,7 +13,7 @@ import { Copy, BarChart3, ExternalLink } from "lucide-react";
 import { useSelector } from "react-redux";
 import toast from "react-hot-toast";
 
-export default function UrlTable() {
+export default function Url() {
   const data = useSelector((state) => state.urls.urls);
 
   const copyHandler = (item) => {
