@@ -6,10 +6,14 @@ import DashboardStats from "@/components/DashboardStats";
 import { Scissors, CheckCheck, Copy } from "lucide-react";
 import AnalyticsChart from "@/components/AnalyticsChart";
 import toast from "react-hot-toast";
-// import UrlTable from "../components/UrlTable";
+import UrlTable from "../components/UrlTable";
+import { useDispatch } from "react-redux";
+import { setUrls } from "@/store/urlsSlice";
+import { addUrl } from "@/store/urlsSlice";
 
 const Dashboard = () => {
   const { email, token, name } = useSelector((state) => state.user);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -24,13 +28,13 @@ const Dashboard = () => {
           }
         );
 
-        console.log("User URLs:", res.data);
+        dispatch(setUrls(res.data));
       } catch (err) {
         console.error(err);
       }
     };
     fetchUserUrls();
-  }, []);
+  }, [dispatch]);
 
   const [longUrl, setLongUrl] = useState("");
   const [alias, setAlias] = useState("");
@@ -51,6 +55,7 @@ const Dashboard = () => {
       );
 
       setShortened(res.data);
+      dispatch(addUrl(res.data));
     } catch (err) {
       setError(err.response?.data?.message || "Something went wrong");
     }
@@ -72,7 +77,7 @@ const Dashboard = () => {
           Manage your shortened URLs and track their performance
         </p>
 
-        <DashboardStats />
+        {/* <DashboardStats /> */}
 
         {/* Shorten URL Form */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -172,6 +177,8 @@ const Dashboard = () => {
           </div>
         </div>
         {/* <UrlTable /> */}
+
+        <UrlTable />
       </div>
     </div>
   );

@@ -1,6 +1,10 @@
 // src/components/AnalyticsChart.jsx
 import React from "react";
 import { ChartSpline } from "lucide-react";
+import { useEffect } from "react";
+import { useState } from "react";
+import { useSelector } from "react-redux";
+
 import {
   LineChart,
   Line,
@@ -11,19 +15,51 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-const data = [
-  { date: "Jan 08", clicks: 50 },
-  { date: "Jan 09", clicks: 90 },
-  { date: "Jan 10", clicks: 70 },
-  { date: "Jan 11", clicks: 100 },
-  { date: "Jan 12", clicks: 130 },
-  { date: "Jan 13", clicks: 160 },
-  { date: "Jan 14", clicks: 200 },
-];
+// const data = ;
 
 const AnalyticsChart = () => {
-  const totalClicks = data.reduce((sum, item) => sum + item.clicks, 0);
-  const dailyAverage = Math.round(totalClicks / data.length);
+  const urls = useSelector((state) => state.urls.urls);
+  const [totalClicks, setTotalClicks] = useState(0);
+  const [dailyAverage, setDailyAverage] = useState(0);
+
+  const [data, setData] = useState([
+    { date: "Jan 08", clicks: 50 },
+    { date: "Jan 09", clicks: 90 },
+    { date: "Jan 10", clicks: 70 },
+    { date: "Jan 11", clicks: 100 },
+    { date: "Jan 12", clicks: 130 },
+    { date: "Jan 13", clicks: 160 },
+    { date: "Jan 14", clicks: 200 },
+  ]);
+
+  useEffect(() => {
+    if (!urls || urls.length === 0) return;
+
+    const aggregated = urls.reduce((acc, url) => {
+      url.dailyClicks.forEach((day) => {
+        const d = day.date; // already in YYYY-MM-DD
+        if (!acc[d]) {
+          acc[d] = 0;
+        }
+        acc[d] += day.clicks;
+      });
+      return acc;
+    }, {});
+
+    // Convert to array for recharts
+    const formatted = Object.entries(aggregated).map(([date, clicks]) => ({
+      date,
+      clicks,
+    }));
+    formatted.sort((a, b) => new Date(a.date) - new Date(b.date));
+    const last7Days = formatted.slice(-7);
+
+    setData(last7Days);
+    const total = last7Days.reduce((sum, entry) => sum + entry.clicks, 0);
+    const dailyAverage = total / last7Days.length;
+    setTotalClicks(total);
+    setDailyAverage(parseInt(dailyAverage));
+  }, [urls]);
 
   return (
     <div className="p-6 bg-[#131320]  rounded-xl w-full text-white shadow-lg h-full">
@@ -43,11 +79,29 @@ const AnalyticsChart = () => {
       <ResponsiveContainer width="100%" height={300}>
         <LineChart
           data={data}
-          margin={{ top: 10, right: 20, left: 0, bottom: 0 }}
+          margin={{ top: 10, right: 10, left: 10, bottom: 10 }}
         >
           <CartesianGrid stroke="#444" strokeDasharray="3 3" />
-          <XAxis dataKey="date" stroke="#aaa" />
-          <YAxis stroke="#aaa" />
+          <XAxis
+            dataKey="date"
+            stroke="#aaa"
+            tick={{ dy: 10 }}
+            // label={{
+            //   value: "Date",
+            //   position: "insideBottom", // or "insideBottomRight" / "bottom"
+            //   dy: 25, // 👈 pushes the axis label further down so it doesn’t overlap
+            //   style: { fill: "#aaa", fontSize: 14 },
+            // }}
+          />
+          <YAxis
+            stroke="#aaa"
+            label={{
+              value: "Clicks",
+              angle: -90,
+              position: "insideLeft",
+              style: { textAnchor: "middle", fill: "#aaa" },
+            }}
+          />
           <Tooltip
             contentStyle={{
               backgroundColor: "#1f2937",
