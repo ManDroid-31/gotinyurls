@@ -26,9 +26,13 @@ app.use("/api/url", urlRoutes);
 
 app.get("/:shortUrl", async (req, res) => {
 
-  const ip = req.headers["x-forwarded-for"]?.split(",")[0] || req.socket.remoteAddress;
+  const ip = req.ip;
 
-  console.log(`Redirect request from IP: ${ip}`);
+  const forwardedIp = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+
+  console.log(`req.ip: ${ip}`);
+
+  console.log(`req.headers['x-forwarded-for']: ${forwardedIp}`);
 
   try {
     const { shortUrl } = req.params;
