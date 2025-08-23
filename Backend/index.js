@@ -18,6 +18,8 @@ const allowedOrigins = [process.env.FRONTEND_URL];
 
 app.use(cors({ origin: "*" }));
 
+app.set('trust proxy', true);
+
 app.get("/", (_req, res) => res.send("Shortify API OK"));
 
 app.use("/api/auth", authRoutes);
