@@ -1,10 +1,9 @@
-
 name: Keep Render Backend Awake
 
 on:
   schedule:
-    - cron: "*/10 * * * *"   # every 10 minutes
-  workflow_dispatch:          # allows manual trigger
+    - cron: "*/10 * * * *" # every 10 minutes
+  workflow_dispatch: # allows manual trigger
 
 jobs:
   ping:
@@ -12,3 +11,5 @@ jobs:
     steps:
       - name: Curl Render Backend
         run: curl -s https://shortify-o6vy.onrender.com/ > /dev/null
+      - name: Curl Backend 2
+        run: curl -s https://gotinyurls.onrender.com > /dev/null
