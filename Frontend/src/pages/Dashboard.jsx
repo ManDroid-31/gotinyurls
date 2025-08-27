@@ -178,7 +178,7 @@ const Dashboard = () => {
         </div>
         {/* <UrlTable /> */}
 
-        <UrlTable />
+        {/* <UrlTable /> */}
       </div>
     </div>
   );
