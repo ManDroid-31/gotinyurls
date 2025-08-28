@@ -1,13 +1,15 @@
 import Url from "../models/Url.js";
 import { redisConnect } from "../config.js/redis.js";
 import getDate from "../utils/getDate.js";
+// import { clickQueue } from "../config.js/redis.js";
 
 const redis = redisConnect();
 
 export const handleRedirect = async (req, res) => {
-  const ip = req.ip;
+  // const ip = req.ip;
   // not needed coz app.set('trust proxy', true);
-  // const forwardedIp = req.headers['x-forwarded-for'] || req.connection.remoteAddress;  
+  // const forwardedIp = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+  // console.log(ip);
 
   try {
     const { shortUrl } = req.params;
@@ -16,7 +18,8 @@ export const handleRedirect = async (req, res) => {
     const cachedUrl = await redis.get(`url:${shortUrl}`);
 
     if (cachedUrl) {
-      await redis.xadd(`url:${shortUrl}:clicks`, '*', { 'ip' : ip , 'date' : today });
+      // await redis.xadd(`url:${shortUrl}:clicks`, "*", { ip: ip, date: today });
+      // await clickQueue.add("click", { shortUrl, ip, ua, ts: today });
       return res.redirect(302, cachedUrl);
     }
 
@@ -25,24 +28,10 @@ export const handleRedirect = async (req, res) => {
       return res.status(404).json({ message: "URL not found" });
     }
 
-    // url.clicks = (url.clicks || 0) + 1;
-
-    
-    // const todayEntry = url.dailyClicks.find(entry => entry.date === today);
-
-    // if (todayEntry) {
-    //   todayEntry.clicks += 1;
-    // } else {
-    //   url.dailyClicks.push({ date: today, clicks: 1 });
-    // }
-
-    // await url.save();
-
     console.log(url);
 
-    await redis.set(`url:${shortUrl}`, url.originalUrl);
-
-   await redis.xadd(`url:${shortUrl}:clicks`, '*', { 'ip' : ip , 'date' : today });
+    await redis.set(`url:${shortUrl}`, url.originalUrl, "EX", 60 * 60);
+    // await clickQueue.add("click", { shortUrl, ip, ua, ts: today });
 
     return res.redirect(302, url.originalUrl);
   } catch (err) {

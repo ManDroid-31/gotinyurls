@@ -2,9 +2,9 @@ import Url from "../models/Url.js";
 import { nanoid } from "nanoid";
 import User from "../models/User.js";
 import { encode } from "../utils/base62.js";
+// import { clickQueue } from "../config.js/redis.js";
 
 export const shortenUrl = async (req, res) => {
-
   try {
     const { originalUrl, alias, email } = req.body;
 
@@ -12,14 +12,14 @@ export const shortenUrl = async (req, res) => {
       return res.status(400).json({ message: "Original URL is required" });
     }
 
-    if (alias != '') {
+    if (alias != "") {
       const existing = await Url.findOne({ alias });
       if (existing) {
         return res.status(400).json({ message: "Alias already in use" });
       }
     }
 
-    const shortUrl = alias || nanoid(4); 
+    const shortUrl = alias || nanoid(4);
 
     const user = await User.findOne({ email: email });
 
@@ -35,7 +35,7 @@ export const shortenUrl = async (req, res) => {
       dailyClicks.push({ date: formattedDate, clicks: 0 });
     }
 
-     const newUrl = await Url.create({
+    const newUrl = await Url.create({
       originalUrl,
       shortUrl,
       alias: alias || null,
@@ -50,12 +50,9 @@ export const shortenUrl = async (req, res) => {
   }
 };
 
-
 export const getUserUrls = async (req, res) => {
-
   try {
-
-    const { email } = req.query; 
+    const { email } = req.query;
 
     if (!email) {
       return res.status(400).json({ message: "Email is required" });
@@ -70,8 +67,7 @@ export const getUserUrls = async (req, res) => {
     const urls = await Url.find({ user: user._id });
 
     res.status(200).json(urls);
-
   } catch (err) {
     res.status(500).json({ message: "Server error" });
   }
-}
+};
