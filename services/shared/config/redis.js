@@ -10,14 +10,6 @@ export const redisConnect = () => {
       token: process.env.UPSTASH_REDIS_REST_TOKEN,
     });
   }
+  console.log("Redis Connected");
   return redis;
 };
-
-export const clickQueue = new Queue("clicks", {
-  connection: {
-    host: process.env.REDIS_URL,
-    port: 6379,
-    password: process.env.UPSTASH_REDIS_REST_TOKEN,
-    tls: {},
-  },
-});

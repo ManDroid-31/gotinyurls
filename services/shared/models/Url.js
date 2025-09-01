@@ -15,5 +15,7 @@ const urlSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
 });
 
+// urlSchema.index({ shortUrl: 1 }, { unique: true });
+
 const Url = mongoose.model("Url", urlSchema);
 export default Url;

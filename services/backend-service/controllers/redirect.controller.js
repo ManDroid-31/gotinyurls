@@ -1,7 +1,7 @@
-import Url from "../models/Url.js";
-import { redisConnect } from "../config.js/redis.js";
+import Url from "../../shared/models/Url.js";
+import { redisConnect } from "../../shared/index.js";
+import { clickQueue } from "shared/config/queue.js";
 import getDate from "../utils/getDate.js";
-import { clickQueue } from "../config.js/redis.js";
 import {
   POS_KEY,
   NEG_KEY,
@@ -25,7 +25,16 @@ export const handleRedirect = async (req, res) => {
 
     // Positive Cache
     if (cachedUrl) {
-      await clickQueue.add("click", { shortUrl, ip, ts: today });
+      await clickQueue.add(
+        "click",
+        { shortUrl, ip, ts: today },
+        {
+          removeOnComplete: true,
+          removeOnFail: 20,
+          attempts: 5,
+          backoff: { type: "exponential", delay: 2000 },
+        }
+      );
       return res.redirect(302, cachedUrl);
     }
 

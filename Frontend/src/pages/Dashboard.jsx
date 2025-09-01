@@ -173,12 +173,12 @@ const Dashboard = () => {
           {/* 7-Day Analytics Chart */}
 
           <div className="bg-[#0A0A0A] rounded-lg flex items-center md:col-span-2 justify-center md:min-h-[100%]">
-            <AnalyticsChart />
+            {/* <AnalyticsChart /> */}
           </div>
         </div>
         {/* <UrlTable /> */}
 
-        <UrlTable />
+        {/* <UrlTable /> */}
       </div>
     </div>
   );

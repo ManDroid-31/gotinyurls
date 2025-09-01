@@ -3,8 +3,8 @@ import express from "express";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import morgan from "morgan";
-import { connectDB } from "./config.js/db.js";
-import { redisConnect } from "./config.js/redis.js";
+import { redisConnect, connectDB } from "../shared/index.js";
+import { clickQueue } from "shared/config/queue.js";
 import authRoutes from "./routes/auth.js";
 import urlRoutes from "./routes/url.js";
 import redirectRoutes from "./routes/redirect.js";
@@ -31,7 +31,7 @@ app.use("/", redirectRoutes);
 
 const PORT = process.env.PORT || 5000;
 connectDB().then(() => {
-  app.listen(PORT, () =>
-    console.log(`API running on http://localhost:${PORT}`)
-  );
+  app.listen(PORT, async () => {
+    console.log(`API running on http://localhost:${PORT}`);
+  });
 });
