@@ -83,8 +83,8 @@ async function flushAnalytics() {
 // Run periodically
 setInterval(flushAnalytics, FLUSH_INTERVAL);
 
-app.listen(3001, async () => {
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, async () => {
   await connectDB();
-
-  console.log("Analytics worker service running on port 3001");
+  console.log(`Analytics worker service running on port ${PORT}`);
 });
