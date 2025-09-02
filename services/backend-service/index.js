@@ -13,9 +13,9 @@ const app = express();
 const redis = redisConnect();
 
 app.use(morgan("dev"));
+app.use(cors({ origin: "*" }));
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors({ origin: "*" }));
 app.set("trust proxy", true);
 
 app.get("/", async (req, res) => {

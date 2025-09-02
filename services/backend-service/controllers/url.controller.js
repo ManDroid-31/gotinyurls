@@ -2,15 +2,31 @@ import { Url, UrlAnalytics } from "../../shared/index.js";
 import { User } from "../../shared/index.js";
 import { encodeBase62 } from "../utils/base62.js";
 import { redisConnect } from "../../shared/index.js";
+import bcrypt from "bcryptjs";
 
 const redis = redisConnect();
 
 export const shortenUrl = async (req, res) => {
   try {
-    const { originalUrl, alias, email } = req.body;
+    const {
+      originalUrl,
+      email,
+      title,
+      alias,
+      expiry,
+      enableQr,
+      password,
+      enablePassword,
+    } = req.body.payload;
 
     if (!originalUrl) {
       return res.status(400).json({ message: "Original URL is required" });
+    }
+
+    // Find user
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
     }
 
     // If alias is provided, ensure it's unique
@@ -21,40 +37,46 @@ export const shortenUrl = async (req, res) => {
       }
     }
 
-    // Find user
-    const user = await User.findOne({ email: email });
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
+    // Generate short URL
     let shortUrl;
     if (alias && alias.trim() !== "") {
-      shortUrl = alias;
+      shortUrl = alias.trim();
     } else {
-      // Get unique counter from Redis
       const counter = await redis.incr("url_counter");
       shortUrl = encodeBase62(counter);
     }
 
-    // const dailyClicks = [];
-    // for (let i = 6; i >= 0; i--) {
-    //   const date = new Date();
-    //   date.setDate(date.getDate() - i);
-    //   const formattedDate = date.toISOString().split("T")[0];
-    //   dailyClicks.push({ date: formattedDate, clicks: 0 });
-    // }
+    // Handle password protection
+    let hashedPassword = null;
+    if (enablePassword && password) {
+      hashedPassword = await bcrypt.hash(password, 10);
+    }
+
+    // Expiry date
+    let expiresAt = null;
+    if (expiry) {
+      expiresAt = new Date(expiry);
+    }
 
     const newUrl = await Url.create({
       originalUrl,
       shortUrl,
       alias: alias || null,
+      title: title || null,
       user: user._id,
-      // dailyClicks,
+      expiresAt,
+      enableQr: !!enableQr,
+      enablePassword: !!enablePassword,
+      password: hashedPassword,
     });
 
-    res.status(201).json(newUrl);
+    res.status(201).json({
+      message: "Short URL created successfully",
+      shortUrl,
+      url: newUrl,
+    });
   } catch (err) {
-    console.error(err);
+    console.error("Error in shortenUrl:", err);
     res.status(500).json({ message: "Server error" });
   }
 };

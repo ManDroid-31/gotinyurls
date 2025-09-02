@@ -3,16 +3,15 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "react-router-dom";
 export default function Hero() {
   return (
-    <section className="text-center text-white py-20 bg-[#0A0A0A] min-h-screen">
+    <section className="text-center text-white py-20 bg-[#090b0b] min-h-screen">
       {/* Title + Subtitle */}
-      <h1 className="text-5xl font-extrabold leading-tight">
-        Shorten <span className="text-blue-400">URLs</span> <br /> Track
-        Everything
+      <h1 className="text-6xl font-extrabold leading-tight">
+        Transform Your <span className="text-[#bcdeff]">Links</span>
+        <br /> in a Click
       </h1>
-      <p className="mt-6 text-gray-400 max-w-2xl mx-auto">
-        Create powerful short links with advanced analytics, custom domains, and
-        enterprise-grade reliability. Perfect for marketers, developers, and
-        businesses.
+      <p className="mt-6 text-lg tracking-wider text-gray-400 ">
+        Effortlessly shorten, secure, and optimize your links with cutting-edge
+        tools.
       </p>
 
       {/* Buttons */}
@@ -30,7 +29,7 @@ export default function Hero() {
 
       {/* Shorten URL Demo Card */}
       <div className="mt-16 px-4">
-        <Card className="max-w-2xl mx-auto shadow-2xl border-0 bg-gray-950/80 backdrop-blur-sm">
+        <Card className="max-w-2xl mx-auto shadow-2xl border-0 bg-[#141515] backdrop-blur-sm">
           <CardContent className="p-8">
             <div className="space-y-4">
               {/* Long URL box */}

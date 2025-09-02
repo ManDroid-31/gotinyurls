@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import axios from "axios";
-import DashboardNavbar from "@/components/DashboardNavbar";
-import DashboardStats from "@/components/DashboardStats";
+import DashboardNavbar from "@/components/rmDashboardNavbar";
+import DashboardStats from "@/components/rmDashboardStats";
 import { Scissors, CheckCheck, Copy } from "lucide-react";
-import AnalyticsChart from "@/components/AnalyticsChart";
+import AnalyticsChart from "@/components/rmAnalyticsChart";
 import toast from "react-hot-toast";
 import UrlTable from "@/components/Url";
 import { useDispatch } from "react-redux";
 import { setUrls } from "@/store/urlsSlice";
 import { addUrl } from "@/store/urlsSlice";
 
-const Dashboard = () => {
+const Dashboard2 = () => {
   const { email, token, name } = useSelector((state) => state.user);
   const dispatch = useDispatch();
 
@@ -184,4 +184,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default Dashboard2;
