@@ -21,8 +21,8 @@ const worker = new Worker(
     const key = `analytics:${ts}`;
 
     // Field = shortUrl, Value = clicks
+    console.log("Incrementing", key, shortUrl);
     await redis.hincrby(key, shortUrl, 1);
-    return Promise.resolve();
   },
   {
     connection: {
@@ -82,6 +82,10 @@ async function flushAnalytics() {
 
 // Run periodically
 setInterval(flushAnalytics, FLUSH_INTERVAL);
+
+app.get("/", (req, res) => {
+  res.send("Analytics worker service is running");
+});
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, async () => {
