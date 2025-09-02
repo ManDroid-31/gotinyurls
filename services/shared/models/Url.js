@@ -17,6 +17,7 @@ const urlSchema = new mongoose.Schema({
   enablePassword: { type: Boolean, default: false },
   password: { type: String },
   createdAt: { type: Date, default: Date.now },
+  qrCode: { type: String },
 });
 
 const Url = mongoose.model("Url", urlSchema);

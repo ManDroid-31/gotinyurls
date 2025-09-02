@@ -1,6 +1,7 @@
 import { Url, UrlAnalytics } from "../../shared/index.js";
 import { User } from "../../shared/index.js";
 import { encodeBase62 } from "../utils/base62.js";
+import QRCode from "qrcode";
 import { redisConnect } from "../../shared/index.js";
 import bcrypt from "bcryptjs";
 
@@ -58,6 +59,13 @@ export const shortenUrl = async (req, res) => {
       expiresAt = new Date(expiry);
     }
 
+    let qrCode = null;
+
+    if (enableQr) {
+      const url = process.env.BACKEND_URL + "/" + shortUrl;
+      qrCode = await QRCode.toDataURL(url);
+    }
+
     const newUrl = await Url.create({
       originalUrl,
       shortUrl,
@@ -68,12 +76,14 @@ export const shortenUrl = async (req, res) => {
       enableQr: !!enableQr,
       enablePassword: !!enablePassword,
       password: hashedPassword,
+      qrCode: qrCode,
     });
 
     res.status(201).json({
       message: "Short URL created successfully",
       shortUrl,
       url: newUrl,
+      qrCode,
     });
   } catch (err) {
     console.error("Error in shortenUrl:", err);

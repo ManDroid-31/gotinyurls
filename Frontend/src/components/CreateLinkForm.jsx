@@ -9,6 +9,7 @@ import { Calendar22 } from "@/components/Calendar";
 import { useCreateLink } from "@/hooks/useCreateLink";
 import { CheckCheck, Copy, QrCode } from "lucide-react";
 import toast from "react-hot-toast";
+import QRPopup from "./QRPopup";
 
 const inputClass =
   "bg-[#303130] !border-none !ring-0 !outline-none shadow-none text-white placeholder:text-gray-300";
@@ -30,6 +31,9 @@ const CreateLinkForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [shortened, setShortened] = useState(null);
+  const [qrCode, setQrCode] = useState(null);
+  const [qrUrl, setQrUrl] = useState(null);
+  const [qrPopupOpen, setQrPopupOpen] = useState(false);
 
   // --- Handlers ---
   const handleChange = (e) => {
@@ -43,11 +47,15 @@ const CreateLinkForm = () => {
       email: localStorage.getItem("email"),
       title: formData.title?.trim() || null,
       alias: formData.custom?.trim() || null,
-      expiry: expiryDate.toISOString() || null,
+      expiry: expiryDate != null ? expiryDate.toISOString() : null,
       enableQr: formData.enableQr,
       enablePassword: formData.enablePassword,
     };
 
+    if (formData.destination == "") {
+      toast.error("Original URL is required");
+      return null;
+    }
     if (!expiryDate || Date.now() >= expiryDate) {
       toast.error("Expiry date must be valid");
       return null;
@@ -64,7 +72,7 @@ const CreateLinkForm = () => {
       }
       payload.password = formData.password;
     }
-
+    setQrCode(payload.enableQr);
     return payload;
   };
 
@@ -76,6 +84,22 @@ const CreateLinkForm = () => {
     try {
       const res = await createLink(payload);
       setShortened(res.shortUrl);
+
+      if (res.qrCode) {
+        setQrUrl(res.qrCode);
+      }
+
+      setFormData({
+        destination: "",
+        title: "",
+        custom: "",
+        expiry: null,
+        enableQr: false,
+        enablePassword: false,
+        password: "",
+        confirmPassword: "",
+      });
+      setExpiryDate(null);
 
       toast.success("Link created successfully!");
     } catch (err) {
@@ -110,36 +134,41 @@ const CreateLinkForm = () => {
                   </div>
                 </div>
                 <div className="flex justify-between sm:w-fit w-full gap-2">
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      navigator.clipboard
-                        .writeText(
-                          `${import.meta.env.VITE_BACKEND_URL}/${shortened}`
-                        )
-                        .then(() => {
-                          toast.success("Shortened URL copied to clipboard!");
-                        });
-                    }}
-                    className="p-2 rounded-md border border-gray-600 bg-black text-white hover:text-[#BBF7D0]"
-                  >
-                    <Copy className="h-5 w-5" />
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      navigator.clipboard
-                        .writeText(
-                          `${import.meta.env.VITE_BACKEND_URL}/${shortened}`
-                        )
-                        .then(() => {
-                          toast.success("Shortened URL copied to clipboard!");
-                        });
-                    }}
-                    className="p-2 rounded-md border border-gray-600 bg-black text-white hover:text-[#BBF7D0]"
-                  >
-                    <QrCode className="h-5 w-5" />
-                  </button>
+                  {shortened && (
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        navigator.clipboard
+                          .writeText(
+                            `${import.meta.env.VITE_BACKEND_URL}/${shortened}`
+                          )
+                          .then(() => {
+                            toast.success("Shortened URL copied to clipboard!");
+                          });
+                      }}
+                      className="p-2 rounded-md border border-gray-600 bg-black text-white hover:text-[#BBF7D0]"
+                    >
+                      <Copy className="h-5 w-5" />
+                    </button>
+                  )}
+                  {qrCode && (
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setQrPopupOpen(true);
+                      }}
+                      className="p-2 rounded-md border border-gray-600 bg-black text-white hover:text-[#BBF7D0]"
+                    >
+                      <QrCode className="h-5 w-5" />
+                    </button>
+                  )}
+
+                  {qrPopupOpen && (
+                    <QRPopup
+                      url={qrUrl}
+                      onClose={() => setQrPopupOpen(false)}
+                    />
+                  )}
                 </div>
               </div>
             )}
@@ -216,11 +245,25 @@ const CreateLinkForm = () => {
             />
           </CardContent>
 
-          <CardFooter className="flex flex-col sm:flex-row justify-between items-center gap-3">
+          <CardFooter className="flex mt-5 flex-col sm:flex-row justify-between items-center gap-3">
             <Button
               type="button"
               variant="ghost"
-              className="text-gray-400 hover:text-white w-full sm:w-auto"
+              className="text-gray-400  w-full sm:w-auto"
+              onClick={() => {
+                setFormData({
+                  destination: "",
+                  title: "",
+                  custom: "",
+                  expiry: null,
+                  enableQr: false,
+                  enablePassword: false,
+                  password: "",
+                  confirmPassword: "",
+                });
+                setExpiryDate(null);
+                setShortened(null);
+              }}
             >
               Cancel
             </Button>

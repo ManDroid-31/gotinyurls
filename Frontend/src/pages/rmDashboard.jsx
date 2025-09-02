@@ -6,7 +6,7 @@ import DashboardStats from "@/components/rmDashboardStats";
 import { Scissors, CheckCheck, Copy } from "lucide-react";
 import AnalyticsChart from "@/components/rmAnalyticsChart";
 import toast from "react-hot-toast";
-import UrlTable from "@/components/Url";
+import UrlTable from "@/components/rmUrl";
 import { useDispatch } from "react-redux";
 import { setUrls } from "@/store/urlsSlice";
 import { addUrl } from "@/store/urlsSlice";
