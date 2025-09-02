@@ -1,0 +1,19 @@
+{
+  "name": "analytics-service",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "npx nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "bullmq": "^5.58.4",
+    "dotenv": "^17.2.1",
+    "express": "^5.1.0",
+    "shared": "file:../shared"
+  }
+}
