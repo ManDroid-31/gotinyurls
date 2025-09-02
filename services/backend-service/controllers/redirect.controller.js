@@ -14,8 +14,10 @@ const redis = redisConnect();
 export const handleRedirect = async (req, res) => {
   const ip = req.ip;
   // not needed coz app.set('trust proxy', true);
-  // const forwardedIp = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-  // console.log(ip);
+  const forwardedIp =
+    req.headers["x-forwarded-for"] || req.connection.remoteAddress;
+  console.log(ip);
+  console.log("ForwardedIP: ", forwardedIp);
 
   try {
     const { shortUrl } = req.params;

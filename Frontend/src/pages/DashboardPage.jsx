@@ -10,7 +10,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Calendar22 } from "@/components/Calendar";
 
 import CreateLinkForm from "@/components/CreateLinkForm";
-import Analytics from "@/components/rmAnalytics";
+import Analytics from "@/components/Analytics";
 import History from "@/components/History";
 import { useNavigate } from "react-router-dom";
 
