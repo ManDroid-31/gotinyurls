@@ -1,94 +1,32 @@
 import express from "express";
 import dotenv from "dotenv";
+import cron from "node-cron";
 import { connectDB } from "shared/config/db.js";
-import UrlAnalytics from "shared/models/UrlAnalytics.js";
-import { Worker } from "bullmq";
-import { Redis } from "@upstash/redis";
-import { redisConnect } from "shared/config/redis.js";
+import { clickWorker } from "./workers/clickWorker.js";
+import { flushAnalytics } from "./tasks/flushAnalytics.js";
+import { downloadDB } from "./utils/downloadDB.js";
+
 dotenv.config();
 
 const app = express();
-const redis = redisConnect();
+const FLUSH_INTERVAL_MS = 60 * 1000; // 10 seconds
 
-// Worker
-const worker = new Worker(
-  "clicks",
-  async (job) => {
-    const { shortUrl, ts, ip } = job.data;
-    if (!shortUrl || !ts || !ip) return;
+// Run periodic flush
+setInterval(flushAnalytics, FLUSH_INTERVAL_MS);
 
-    // Key = daily bucket
-    const key = `analytics:${ts}`;
-
-    // Field = shortUrl, Value = clicks
-    console.log("Incrementing", key, shortUrl);
-    await redis.hincrby(key, shortUrl, 1);
-  },
-  {
-    connection: {
-      host: process.env.REDIS_URL,
-      port: 6379,
-      password: process.env.UPSTASH_REDIS_REST_TOKEN,
-      tls: {},
-    },
-    // concurrency: 100,
-    defaultJobOptions: {
-      removeOnComplete: true,
-      removeOnFail: 50,
-      attempts: 3,
-      backoff: {
-        type: "exponential",
-        delay: 2000,
-      },
-    },
-  }
-);
-
-worker.on("failed", (job, err) => {
-  console.error(`Job ${job.id} failed:`, err);
+// Health check endpoint
+app.get("/", (_, res) => {
+  res.send("✅ Analytics worker service is running");
 });
 
-const FLUSH_INTERVAL = 60 * 1000;
-
-async function flushAnalytics() {
-  // Find all keys like "analytics:YYYY-MM-DD"
-  const keys = await redis.keys("analytics:*");
-  if (keys.length === 0) return;
-
-  for (const key of keys) {
-    const date = key.split(":")[1]; // extract YYYY-MM-DD
-    const data = await redis.hgetall(key);
-
-    console.log("Flushing data for", date, data);
-
-    if (!data || Object.keys(data).length === 0) continue;
-
-    const bulkOps = Object.entries(data).map(([shortUrl, count]) => ({
-      updateOne: {
-        filter: { shortUrl, date },
-        update: { $inc: { clicks: parseInt(count, 10) } },
-        upsert: true,
-      },
-    }));
-
-    console.log("Bulk Ops:", bulkOps);
-    if (bulkOps.length > 0) {
-      await UrlAnalytics.bulkWrite(bulkOps);
-      console.log(`✅ Flushed ${bulkOps.length} entries for ${date}`);
-      await redis.del(key); // clear after flush
-    }
-  }
-}
-
-// Run periodically
-setInterval(flushAnalytics, FLUSH_INTERVAL);
-
-app.get("/", (req, res) => {
-  res.send("Analytics worker service is running");
+// Refresh MaxMind DB every 12 hours
+cron.schedule("0 */12 * * *", () => {
+  downloadDB();
 });
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, async () => {
   await connectDB();
-  console.log(`Analytics worker service running on port ${PORT}`);
+  // downloadDB();
+  console.log(`🚀 Analytics worker running on port ${PORT}`);
 });

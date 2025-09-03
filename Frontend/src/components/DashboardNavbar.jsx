@@ -1,4 +1,3 @@
-"use client";
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import {
@@ -35,7 +34,7 @@ const DashboardNavbar = (prop) => {
   return (
     <nav className="flex h-screen bg-[#090b0b] text-white">
       {/* Sidebar (desktop) */}
-      <aside className="hidden lg:flex w-72 flex-col justify-between pt-6 pl-4 bg-[#090b0b]">
+      <aside className="hidden md:flex w-72 flex-col justify-between pt-6 pl-4 bg-[#090b0b]">
         <div className="space-y-6">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
@@ -96,7 +95,7 @@ const DashboardNavbar = (prop) => {
       {/* Mobile Sidebar */}
       <Sheet>
         <SheetTrigger asChild>
-          <Button variant="ghost" className="lg:hidden absolute top-4 left-4">
+          <Button variant="ghost" className="md:hidden absolute top-4 left-4">
             <Menu />
           </Button>
         </SheetTrigger>

@@ -25,7 +25,7 @@ const History = () => {
       <div className="flex flex-col gap-4">
         {urls.map((item) => (
           <div
-            key={item.id}
+            key={item._id}
             className="flex flex-col lg:flex-row justify-between bg-[#1b1a1a] p-4 rounded-lg gap-4"
           >
             <div className="flex gap-4 items-center">

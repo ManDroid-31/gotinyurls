@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/popover";
 
 export function Calendar22(props) {
-  const { setExpiryDate, expiryDate } = props;
+  const { setDate, date } = props;
   const [open, setOpen] = useState(false);
 
   return (
@@ -23,21 +23,25 @@ export function Calendar22(props) {
           <Button
             variant="outline"
             id="date"
-            className="w-48 justify-between font-normal bg-[#303130] !border-none !ring-0 !outline-none shadow-none hover:bg-[#303130] text-white placeholder:text-white hover:text-white"
+            className="w-48 justify-between font-normal bg-[#303130] !border-none !ring-0 !outline-none shadow-none hover:bg-[#303130] text-white placeholder:text-white"
           >
-            {expiryDate ? expiryDate.toLocaleDateString() : "Select date"}
+            {date ? date.toLocaleDateString() : "Select date"}
             <ChevronDownIcon />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-auto overflow-hidden p-0" align="start">
+        <PopoverContent
+          className="w-auto overflow-hidden p-0 bg-[#1e1e1e] border-1 border-gray-700 rounded-xl"
+          align="start"
+        >
           <Calendar
             mode="single"
-            selected={expiryDate}
+            selected={date}
             captionLayout="dropdown"
             onSelect={(d) => {
-              setExpiryDate(d);
+              setDate(d);
               setOpen(false);
             }}
+            className="text-gray-200"
           />
         </PopoverContent>
       </Popover>

@@ -1,9 +1,10 @@
-import { Url, UrlAnalytics } from "../../shared/index.js";
+import { Url, UrlAnalytics, UrlRegionAnalytics } from "../../shared/index.js";
 import { User } from "../../shared/index.js";
 import { encodeBase62 } from "../utils/base62.js";
 import QRCode from "qrcode";
 import { redisConnect } from "../../shared/index.js";
 import bcrypt from "bcryptjs";
+import { toLocalDate } from "../utils/formatDate.js";
 
 const redis = redisConnect();
 
@@ -107,13 +108,104 @@ export const getUserUrls = async (req, res) => {
 
     const urls = await Url.find({ user: user._id }).lean();
     const shortUrls = urls.map((u) => u.shortUrl);
-    const analytics = await UrlAnalytics.find({
+
+    const dailyAnalytics = await UrlAnalytics.find({
       shortUrl: { $in: shortUrls },
     }).lean();
 
-    console.log("Analytics:", analytics);
+    const regionAnalytics = await UrlRegionAnalytics.find({
+      shortUrl: { $in: shortUrls },
+    }).lean();
 
-    res.status(200).json({ urls, analytics });
+    console.log(regionAnalytics);
+    res.status(200).json({ urls, dailyAnalytics, regionAnalytics });
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const getAnalytics = async (req, res) => {
+  try {
+    const { email, startDate, endDate, selectedUrl } = req.query;
+
+    let start = null,
+      end = null;
+
+    if (startDate) {
+      start = toLocalDate(startDate);
+    }
+
+    if (endDate) {
+      end = toLocalDate(endDate);
+    }
+    if (!email) {
+      return res.status(400).json({ message: "Email is required" });
+    }
+
+    console.log("start : ", start, " end: ", end, " url: ", selectedUrl);
+
+    const user = await User.findOne({ email: email });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const urls = await Url.find({ user: user._id }).lean();
+    const shortUrls = urls.map((u) => u.shortUrl);
+
+    if (!start && !end && !selectedUrl) {
+      // Date-based analytics: aggregate clicks per date for all user's URLs
+      const dateAnalytics = await UrlAnalytics.aggregate([
+        { $match: { shortUrl: { $in: shortUrls } } },
+        {
+          $group: {
+            _id: "$date",
+            clicks: { $sum: "$clicks" },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            date: "$_id",
+            clicks: 1,
+          },
+        },
+        { $sort: { date: -1 } },
+      ]);
+
+      // Region-based analytics: aggregate clicks per region for all user's URLs
+      const regionAnalytics = await UrlRegionAnalytics.aggregate([
+        { $match: { shortUrl: { $in: shortUrls } } },
+        {
+          $group: {
+            _id: "$region", // group only by region
+            clicks: { $sum: "$clicks" }, // sum clicks
+            lat: { $first: "$lat" }, // pick first lat
+            lng: { $first: "$lng" }, // pick first lng
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            region: "$_id",
+            lat: 1,
+            lng: 1,
+            size: "$clicks",
+          },
+        },
+        { $sort: { size: -1 } },
+      ]);
+
+      // console.log("urls : ", urls);
+
+      // console.log("Date: ", dateAnalytics);
+      console.log("Region: ", regionAnalytics);
+
+      return res.status(200).json({
+        // urls,
+        points: regionAnalytics,
+      });
+    }
   } catch (err) {
     res.status(500).json({ message: "Server error" });
   }

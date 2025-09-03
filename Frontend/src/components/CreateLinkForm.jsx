@@ -216,10 +216,7 @@ const CreateLinkForm = () => {
             {/* Expiry */}
             <div>
               <Label className="mb-2 text-lg block">Expiry</Label>
-              <Calendar22
-                setExpiryDate={setExpiryDate}
-                expiryDate={expiryDate}
-              />
+              <Calendar22 setDate={setExpiryDate} date={expiryDate} />
             </div>
 
             {/* Password protection */}
