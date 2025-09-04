@@ -1,14 +1,12 @@
 import { Link } from "react-router-dom";
 import { Link2 } from "lucide-react";
+import logo from "../assets/logo.png";
 
 export default function Navbar() {
   return (
-    <nav className="flex justify-between items-center px-8 py-4 bg-[#0A0A0A] border-b-[1px] border-[#262626] text-white">
-      <Link to="/" className="flex items-center gap-2">
-        <Link2 className="w-6 h-6" />
-        <span className="text-xl font-bold bg-gradient-to-r from-blue-100 to-blue-400 bg-clip-text text-transparent">
-          Shortify
-        </span>
+    <nav className="flex justify-between items-center px-4 py-6 bg-[#0A0A0A] border-b-[1px] border-[#262626] text-white">
+      <Link to="/">
+        <img src={logo} width={170} alt="" />
       </Link>
       <div className="flex gap-4 items-center">
         <Link to="/login" className="hover:underline">
