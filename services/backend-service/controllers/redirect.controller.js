@@ -2,6 +2,7 @@ import Url from "../../shared/models/Url.js";
 import { redisConnect } from "../../shared/index.js";
 import { clickQueue } from "shared/config/queue.js";
 import getDate from "../utils/getDate.js";
+import { rateLimit } from "../utils/rateLimiter.js";
 import {
   POS_KEY,
   NEG_KEY,
@@ -20,6 +21,12 @@ export const handleRedirect = async (req, res) => {
   console.log("ForwardedIP: ", forwardedIp);
 
   try {
+    const allowed = await rateLimit(ip);
+    if (!allowed) {
+      return res.status(429).json({
+        message: "Too many requests, please try again later.",
+      });
+    }
     const { shortUrl } = req.params;
     const today = getDate();
 

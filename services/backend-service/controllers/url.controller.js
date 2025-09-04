@@ -170,7 +170,7 @@ export const getAnalytics = async (req, res) => {
             clicks: 1,
           },
         },
-        { $sort: { date: -1 } },
+        { $sort: { date: 1 } },
       ]);
 
       // Region-based analytics: aggregate clicks per region for all user's URLs
@@ -196,14 +196,30 @@ export const getAnalytics = async (req, res) => {
         { $sort: { size: -1 } },
       ]);
 
-      // console.log("urls : ", urls);
+      // const dateAnalytics = await UrlAnalytics.aggregate([
+      //   { $match: { shortUrl: { $in: shortUrls } } },
+      //   {
+      //     $group: {
+      //       _id: "$date",
+      //       clicks: { $sum: "$clicks" },
+      //     },
+      //   },
+      //   {
+      //     $project: {
+      //       _id: 0,
+      //       date: "$date",
+      //       clicks: "$clicks",
+      //     },
+      //   },
+      // ]);
 
-      // console.log("Date: ", dateAnalytics);
-      console.log("Region: ", regionAnalytics);
+      console.log("Date: ", dateAnalytics);
+      // console.log("Region: ", regionAnalytics);
 
       return res.status(200).json({
         // urls,
-        points: regionAnalytics,
+        regionAnalytics,
+        dateAnalytics,
       });
     }
   } catch (err) {

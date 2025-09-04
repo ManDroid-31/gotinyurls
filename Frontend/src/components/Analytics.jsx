@@ -7,13 +7,15 @@ import useGetAnalytics from "@/hooks/useGetAnalytics";
 import { Map } from "lucide-react";
 import ClicksDemographics from "./ClicksDemographics";
 import ClicksOverTime from "./ClickOverTime";
+import TopPerforming from "./TopPerforming";
 
 const Analytics = () => {
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
   const [selectedUrl, setSelectedUrl] = useState(null);
   const { getAnalytics, loading, error } = useGetAnalytics();
-  const [points, setPoints] = useState([]);
+  const [regionAnalytics, setRegionAnalytics] = useState([]);
+  const [dateAnalytics, setDateAnalytics] = useState([]);
 
   const handleClear = () => {
     setStartDate(null);
@@ -25,8 +27,8 @@ const Analytics = () => {
     const fetchData = async () => {
       try {
         const res = await getAnalytics(startDate, endDate, selectedUrl);
-        console.log(res.points);
-        setPoints(res.points);
+        setRegionAnalytics(res.regionAnalytics);
+        setDateAnalytics(res.dateAnalytics);
       } catch (err) {
         console.error("Failed to fetch analytics:", err);
       }
@@ -36,7 +38,7 @@ const Analytics = () => {
   }, [getAnalytics, startDate, endDate, selectedUrl]);
 
   return (
-    <div className="flex flex-col rounded-lg gap-6">
+    <div className="flex flex-col rounded-lg gap-6 w-full">
       {/* Header */}
       <h3 className="text-2xl lg:text-3xl text-[#dbdbda] font-medium">
         Analytics
@@ -85,9 +87,20 @@ const Analytics = () => {
       {/* Globe Section */}
       <div className="flex flex-col w-full lg:flex-row gap-6">
         <ClicksDemographics />
-        <WorldGlobe points={points} />
+        <WorldGlobe points={regionAnalytics} />
       </div>
-      <ClicksOverTime />
+
+      <div className="flex flex-col w-full lg:flex-row gap-6">
+        <ClicksOverTime data={dateAnalytics} />
+        <div
+          className="flex flex-col justify-between  bg-[#1b1a1a] border-0 text-white 
+        w-full lg:w-[50%] 
+        max-w-md rounded-2xl p-4"
+        >
+          <TopPerforming />
+          <TopPerforming />
+        </div>
+      </div>
     </div>
   );
 };
